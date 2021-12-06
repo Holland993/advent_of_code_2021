@@ -1,13 +1,8 @@
 use std::fs;
 
 fn main() {
-    //let s = "Hello, world!";
-
     let filename = "../input.txt";
     let content = fs::read_to_string(filename).expect("Dude this is no file i want");
-
-    //let ss: String = s.chars().skip(7).take(5).collect();
-    //let stringCount: u32 = s.chars().count().to_string().parse::<u32>().unwrap();
 
     let mut commonTrueList: Vec<u32> = Vec::new();
     let mut commonFalseList: Vec<u32> = Vec::new();
@@ -18,8 +13,6 @@ fn main() {
         Loop_through(&content, commonFalseList, commonTrueList);
     let binLength: u32 = listBin[0].len().to_string().parse::<u32>().unwrap();
 
-    //println!("{:?}", commonTrueList);
-    //let gamaRate: Vec<u32> = get_common_bit(listBin, commonFalseList, commonTrueList);
     let (gRate, aRate) = get_common_bit(listBin, commonFalseList, commonTrueList);
 
     let gRateString: String = gRate.into_iter().map(|i| i.to_string()).collect::<String>();
@@ -38,7 +31,6 @@ pub fn Loop_through<'a>(
 ) -> (Vec<String>, Vec<u32>, Vec<u32>) {
     let mut binList: Vec<String> = Vec::new();
     for line in content.lines() {
-        // do something with the like
         binList.push(line.to_string());
     }
 
@@ -70,10 +62,10 @@ pub fn get_common_bit(
         for i in 0..val.chars().count().to_string().parse::<u32>().unwrap() {
             if val.chars().nth(i.try_into().expect("d")).expect("no") == '1' {
                 falseList[i as usize] += 1;
-                //println!("true");
+
             } else if val.chars().nth(i.try_into().expect("d")).expect("no") == '0' {
                 trueList[i as usize] += 1;
-                //println!("false");
+                
             }
         }
     }
@@ -94,10 +86,7 @@ pub fn get_common_bit(
             epsilonRate.push(1);
         }
     }
-    // println!(
-    //     "{:?} {:?} {:?} {:?}",
-    //     falseList, trueList, gamaRate, epsilonRate
-    // );
+
     (gamaRate, epsilonRate)
 }
 
