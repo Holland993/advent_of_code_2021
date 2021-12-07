@@ -11,9 +11,12 @@ fn main() {
 
     let (listBin, commonFalseList, commonTrueList) =
         Loop_through(&content, commonFalseList, commonTrueList);
-    let binLength: u32 = listBin[0].len().to_string().parse::<u32>().unwrap();
+    let binLength: i32 = listBin[0].len().to_string().parse::<i32>().unwrap();
+    let mut testList: Vec<String> = Vec::new();
+    testList.push("2d".to_string());
 
-    let (gRate, aRate) = get_common_bit(listBin, commonFalseList, commonTrueList);
+    let (gRate, aRate, commonFalseList, commonTrueList) =
+        get_common_bit(&listBin, commonFalseList, commonTrueList);
 
     let gRateString: String = gRate.into_iter().map(|i| i.to_string()).collect::<String>();
     let aRateString: String = aRate.into_iter().map(|i| i.to_string()).collect::<String>();
@@ -21,7 +24,14 @@ fn main() {
     let gCon = isize::from_str_radix(&gRateString, 2).unwrap();
     let aCon = isize::from_str_radix(&aRateString, 2).unwrap();
 
-    println!("{} * {} = {}", gCon, aCon, gCon * aCon);
+    //println!("{} * {} = {}", gCon, aCon, gCon * aCon);
+    let o2RateBI: String = get_part_2(&listBin, binLength);
+    let cO2RateBI: String = get_part_2_Co2(&listBin, binLength);
+    //println!("oxygen = {}, Co2 = {}", o2RateBI, cO2RateBI);
+
+    let o2Rate = isize::from_str_radix(&o2RateBI, 2).unwrap();
+    let cO2Rate = isize::from_str_radix(&cO2RateBI, 2).unwrap();
+    println!("{} * {} = {}", o2Rate, cO2Rate, o2Rate * cO2Rate);
 }
 
 pub fn Loop_through<'a>(
@@ -49,11 +59,11 @@ pub fn Loop_through<'a>(
     (binList, fList, tList)
 }
 
-pub fn get_common_bit(
-    binList: Vec<String>,
+pub fn get_common_bit<'a>(
+    binList: &'a Vec<String>,
     mut falseList: Vec<u32>,
     mut trueList: Vec<u32>,
-) -> (Vec<u32>, Vec<u32>) {
+) -> (Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>) {
     let mut gamaRate: Vec<u32> = Vec::new();
     let mut epsilonRate: Vec<u32> = Vec::new();
     let iter = binList.iter();
@@ -62,10 +72,8 @@ pub fn get_common_bit(
         for i in 0..val.chars().count().to_string().parse::<u32>().unwrap() {
             if val.chars().nth(i.try_into().expect("d")).expect("no") == '1' {
                 falseList[i as usize] += 1;
-
             } else if val.chars().nth(i.try_into().expect("d")).expect("no") == '0' {
                 trueList[i as usize] += 1;
-                
             }
         }
     }
@@ -87,13 +95,109 @@ pub fn get_common_bit(
         }
     }
 
-    (gamaRate, epsilonRate)
+    (gamaRate, epsilonRate, falseList, trueList)
 }
 
-// Take a list of binary digits of size column by column and find the most common bit in that column
-// e.g. 00100, 11110, 10110, 10111, 10101, 01111, 00111, 11100, 10000, 11001, 00010, 01010
-// e.g. making separate counters gama rate
-// would end up 10110
-// Then find the inverted bits 01001
-// convert binary to Decimal and multiply both numbers to get power consumption
-// e.g. 01001 => 9, 10110 => 22 (Therefore 22 * 9 = 198)
+pub fn get_part_2<'a>(binList: &'a Vec<String>, mut lCount: i32) -> String {
+    let iter = binList.iter();
+    let oLCount = binList[0].len().to_string().parse::<i32>().unwrap(); // original length
+    let mut pos = oLCount - lCount;
+    let mut tCount: i32 = 0;
+    let mut fCount: i32 = 0;
+    lCount -= 1;
+    let mut newList: Vec<String> = Vec::new();
+
+    if pos != binList[0].len().to_string().parse::<i32>().unwrap() {
+        for val in iter {
+            if val.chars().nth(pos as usize).unwrap() == '1' {
+                tCount += 1;
+            } else {
+                fCount += 1;
+            }
+        }
+        let iter = binList.iter();
+
+        if tCount >= fCount {
+            for val in iter {
+                if val.chars().nth(pos as usize).unwrap() == '1' {
+                    newList.push(val.to_string());
+                }
+            }
+        } else {
+            for val in iter {
+                if val.chars().nth(pos as usize).unwrap() == '0' {
+                    newList.push(val.to_string());
+                }
+            }
+        }
+
+        //println!("{:?}", newList);
+
+        //binList[0].to_string()
+
+        if newList.len() == 1 {
+            newList[0].to_string()
+        } else {
+            let ans: String = get_part_2(&newList.clone(), lCount);
+            ans
+        }
+
+        // "dome".to_string()
+    } else {
+        println!("{:?}", binList);
+        let some: String = binList[0].to_string();
+        some
+    }
+}
+
+pub fn get_part_2_Co2<'a>(binList: &'a Vec<String>, mut lCount: i32) -> String {
+    let iter = binList.iter();
+    let oLCount = binList[0].len().to_string().parse::<i32>().unwrap(); // original length
+    let mut pos = oLCount - lCount;
+    let mut tCount: i32 = 0;
+    let mut fCount: i32 = 0;
+    lCount -= 1;
+    let mut newList: Vec<String> = Vec::new();
+
+    if pos != binList[0].len().to_string().parse::<i32>().unwrap() {
+        for val in iter {
+            if val.chars().nth(pos as usize).unwrap() == '1' {
+                tCount += 1;
+            } else {
+                fCount += 1;
+            }
+        }
+        let iter = binList.iter();
+
+        if tCount >= fCount {
+            for val in iter {
+                if val.chars().nth(pos as usize).unwrap() == '0' {
+                    newList.push(val.to_string());
+                }
+            }
+        } else {
+            for val in iter {
+                if val.chars().nth(pos as usize).unwrap() == '1' {
+                    newList.push(val.to_string());
+                }
+            }
+        }
+
+        //println!("{:?}", newList);
+
+        //binList[0].to_string()
+
+        if newList.len() == 1 {
+            newList[0].to_string()
+        } else {
+            let ans: String = get_part_2_Co2(&newList.clone(), lCount);
+            ans
+        }
+
+        // "dome".to_string()
+    } else {
+        println!("{:?}", binList);
+        let some: String = binList[0].to_string();
+        some
+    }
+}
